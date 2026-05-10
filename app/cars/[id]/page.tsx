@@ -42,7 +42,8 @@ export default function CarDetailsPage({ params }: { params: Promise<{ id: strin
               {car.year} {car.brand} {car.model}
             </h1>
             <p className="text-yellow-500 text-xl mt-1">
-              {"⭐".repeat(car.inspectionRating)}{"☆".repeat(5 - car.inspectionRating)}
+              <span className="font-semibold">{car.inspectionRating}/10</span>
+
             </p>
           </div>
           <div className="text-right">
@@ -56,8 +57,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ id: strin
           <p><span className="font-medium">Model:</span> {car.model}</p>
           <p><span className="font-medium">Year:</span> {car.year}</p>
           <p><span className="font-medium">Mileage:</span> {car.mileage.toLocaleString()} miles</p>
-          <p><span className="font-medium">Inspection:</span> {car.inspectionRating}/5 stars</p>
-        </div>
+<p><span className="font-medium">Inspection:</span> {car.inspectionRating}/10</p>        </div>
 
         {car.description && (
           <div className="mb-6">
@@ -66,34 +66,7 @@ export default function CarDetailsPage({ params }: { params: Promise<{ id: strin
           </div>
         )}
 
-        {breakdown && (
-          <div className="bg-gray-50 rounded-lg p-5 mb-6">
-            <h3 className="font-semibold mb-3">Price Breakdown</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Year/Age Score (35%)</span>
-                <span className="font-medium">{breakdown.ageScore}/100</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Mileage Score (30%)</span>
-                <span className="font-medium">{breakdown.mileageScore}/100</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Brand Score (20%)</span>
-                <span className="font-medium">{breakdown.brandScore}/100</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Inspection Score (15%)</span>
-                <span className="font-medium">{breakdown.inspectionScore}/100</span>
-              </div>
-              <div className="flex justify-between font-semibold border-t pt-2 mt-2">
-                <span>Final Composite Score</span>
-                <span>{breakdown.compositeScore}/100</span>
-              </div>
-            </div>
-          </div>
-        )}
-
+        
         <div className="bg-blue-50 rounded-lg p-5 mb-6">
           <h3 className="font-semibold mb-3">Seller Information</h3>
           <div className="space-y-1 text-sm">

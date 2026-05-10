@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -26,9 +26,9 @@ model Car {
   year             Int
   mileage          Int
   inspectionRating Int
-  description      String?  @db.Text
+  description      String?
   price            Int
-  priceBreakdown   String?  @db.Text
+  priceBreakdown   String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   

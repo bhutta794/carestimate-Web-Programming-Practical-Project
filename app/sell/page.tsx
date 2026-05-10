@@ -23,35 +23,29 @@ export default function SellPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // When brand changes, reset model to first model of that brand
   useEffect(() => {
-    setForm(prev => ({
-      ...prev,
-      model: BRAND_MODELS[prev.brand][0].model
-    }));
-  }, [form.brand]);
+  if (!form.mileage) return;
 
-  // Live price preview
-  useEffect(() => {
-    if (!form.mileage) return;
-    const delay = setTimeout(() => {
-      fetch("/api/price-preview", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brand: form.brand,
-          model: form.model,
-          year: form.year,
-          mileage: parseInt(form.mileage),
-          inspectionRating: form.inspectionRating,
-        }),
-      })
-        .then(res => res.json())
-        .then(data => setPreview(data.price));
-    }, 300);
-    return () => clearTimeout(delay);
-  }, [form.brand, form.model, form.year, form.mileage, form.inspectionRating]);
+ 
 
+  fetch("/api/price-preview", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      brand: form.brand,
+      model: form.model,
+      year: form.year,
+      mileage: parseInt(form.mileage),
+      inspectionRating: form.inspectionRating,
+    }),
+  })
+    .then(res => res.json())
+    .then(data => {
+     
+      setPreview(data.price);
+    });
+
+}, [form.brand, form.model, form.year, form.mileage, form.inspectionRating]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -66,7 +60,11 @@ export default function SellPage() {
     else { const data = await res.json(); setError(data.message || "Failed to list car"); }
   };
 
-  if (status === "loading") return <div className="min-h-screen flex items-center justify-center"><div className="text-gray-500">Loading...</div></div>;
+  if (status === "loading") return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-gray-500">Loading...</div>
+    </div>
+  );
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -81,7 +79,11 @@ export default function SellPage() {
         </div>
       )}
 
-      {error && <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm">{error}</div>}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-4 text-sm">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -89,7 +91,11 @@ export default function SellPage() {
           <select
             className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form.brand}
-            onChange={e => setForm({ ...form, brand: e.target.value })}>
+            onChange={e => setForm({
+              ...form,
+              brand: e.target.value,
+              model: BRAND_MODELS[e.target.value][0].model
+            })}>
             {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
         </div>

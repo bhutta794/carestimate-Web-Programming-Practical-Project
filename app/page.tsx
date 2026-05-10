@@ -33,40 +33,8 @@ export default async function HomePage() {
 
       {/* How Price is Calculated */}
       <div className="max-w-5xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">How Pricing Works</h2>
-        <p className="text-center text-gray-500 mb-12">
-          Our system calculates a fair price based on 4 key factors
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-4xl mb-3">📅</div>
-            <h3 className="font-bold text-lg mb-1">Year / Age</h3>
-            <p className="text-blue-600 font-semibold mb-2">35% weight</p>
-            <p className="text-gray-500 text-sm">Newer cars score higher. 15+ year old cars get a 40% reduction.</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-4xl mb-3">🛣️</div>
-            <h3 className="font-bold text-lg mb-1">Mileage</h3>
-            <p className="text-blue-600 font-semibold mb-2">30% weight</p>
-            <p className="text-gray-500 text-sm">Lower mileage scores higher. Compared to expected 12,000 miles/year.</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-4xl mb-3">🏷️</div>
-            <h3 className="font-bold text-lg mb-1">Brand</h3>
-            <p className="text-blue-600 font-semibold mb-2">20% weight</p>
-            <p className="text-gray-500 text-sm">Premium brands like Porsche and Mercedes score higher than budget brands.</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-4xl mb-3">🔍</div>
-            <h3 className="font-bold text-lg mb-1">Inspection</h3>
-            <p className="text-blue-600 font-semibold mb-2">15% weight</p>
-            <p className="text-gray-500 text-sm">5-star inspection gets an 8% price bonus. 1-star scores lowest.</p>
-          </div>
-        </div>
+        <h2 className="text-3xl font-bold text-center mb-4">Our system calculates a fair market price based on the car's condition, history and market factors.</h2>
+        
       </div>
 
       {/* How it works steps */}

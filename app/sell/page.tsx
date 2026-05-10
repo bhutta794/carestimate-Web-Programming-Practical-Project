@@ -22,39 +22,63 @@ export default function SellPage() {
   const [preview, setPreview] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imageFile, setImageFile] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-  if (!form.mileage) return;
+    if (!form.mileage) return;
+    fetch("/api/price-preview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        brand: form.brand,
+        model: form.model,
+        year: form.year,
+        mileage: parseInt(form.mileage),
+        inspectionRating: form.inspectionRating,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => setPreview(data.price));
+  }, [form.brand, form.model, form.year, form.mileage, form.inspectionRating]);
 
- 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageFile(reader.result as string);
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
-  fetch("/api/price-preview", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      brand: form.brand,
-      model: form.model,
-      year: form.year,
-      mileage: parseInt(form.mileage),
-      inspectionRating: form.inspectionRating,
-    }),
-  })
-    .then(res => res.json())
-    .then(data => {
-     
-      setPreview(data.price);
-    });
-
-}, [form.brand, form.model, form.year, form.mileage, form.inspectionRating]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    let imageUrl = null;
+
+    if (imageFile) {
+      setUploading(true);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageFile }),
+      });
+      const uploadData = await uploadRes.json();
+      imageUrl = uploadData.url;
+      setUploading(false);
+    }
+
     const res = await fetch("/api/cars", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, imageUrl }),
     });
+
     setLoading(false);
     if (res.ok) { router.push("/buy"); router.refresh(); }
     else { const data = await res.json(); setError(data.message || "Failed to list car"); }
@@ -164,9 +188,26 @@ export default function SellPage() {
           <p className="text-xs text-gray-400 mt-1">{form.description.length}/1000 characters</p>
         </div>
 
-        <button type="submit" disabled={loading}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Car Image (Optional)</label>
+          <input
+            type="file"
+            accept="image/*"
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            onChange={handleImageChange}
+          />
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="mt-3 rounded-lg w-full h-48 object-cover"
+            />
+          )}
+        </div>
+
+        <button type="submit" disabled={loading || uploading}
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition">
-          {loading ? "Listing your car..." : "List Car for Sale"}
+          {uploading ? "Uploading image..." : loading ? "Listing your car..." : "List Car for Sale"}
         </button>
       </form>
     </div>

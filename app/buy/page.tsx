@@ -14,6 +14,7 @@ interface Car {
   mileage: number;
   inspectionRating: number;
   price: number;
+  imageUrl: string | null;
   description: string | null;
   user: {
     id: string;
@@ -48,8 +49,20 @@ export default function BuyPage() {
   const otherCars = session ? cars.filter(car => car.user.id !== session.user.id) : cars;
 
   const CarCard = ({ car }: { car: Car }) => (
-    <Link key={car.id} href={`/cars/${car.id}`}>
-      <div className="bg-white rounded-lg shadow hover:shadow-lg transition p-5 cursor-pointer border border-gray-100">
+  <Link href={`/cars/${car.id}`}>
+    <div className="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer border border-gray-100">
+      {(car as any).imageUrl ? (
+        <img
+          src={(car as any).imageUrl}
+          alt={`${car.brand} ${car.model}`}
+          className="w-full h-48 object-cover rounded-t-lg"
+        />
+      ) : (
+        <div className="w-full h-48 bg-gray-100 rounded-t-lg flex items-center justify-center">
+          <span className="text-gray-400 text-5xl">🚗</span>
+        </div>
+      )}
+      <div className="p-5">
         <h2 className="text-xl font-bold text-gray-800">
           {car.year} {car.brand} {car.model}
         </h2>
@@ -66,8 +79,9 @@ export default function BuyPage() {
           Seller: {car.user.name}
         </p>
       </div>
-    </Link>
-  );
+    </div>
+  </Link>
+);
 
   if (loading) {
     return (
@@ -118,20 +132,19 @@ export default function BuyPage() {
 
       {/* Other Cars Section */}
       {otherCars.length > 0 && (
-        <div>
-          {session && myCars.length > 0 ? (
-            <h2 className="text-2xl font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200">
-              Other Cars for Sale ({otherCars.length})
-            </h2>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {otherCars.map((car) => (
-                <CarCard key={car.id} car={car} />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+  <div>
+    {session && myCars.length > 0 && (
+      <h2 className="text-2xl font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200">
+        Other Cars for Sale ({otherCars.length})
+      </h2>
+    )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {otherCars.map((car) => (
+        <CarCard key={car.id} car={car} />
+      ))}
+    </div>
+  </div>
+)}
     </div>
   );
 }

@@ -22,15 +22,16 @@ export async function POST(req: Request) {
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
   if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
 
-  const { brand, model, year, mileage, inspectionRating, description } = await req.json();
-  const { price, breakdown } = calculatePrice({ brand, year, mileage, inspectionRating });
+ const { brand, model, year, mileage, inspectionRating, description, imageUrl } = await req.json();
+  const { price, breakdown } = calculatePrice({ brand, model, year, mileage, inspectionRating });
 
   const car = await prisma.car.create({
-    data: {
-      brand, model, year: Number(year), mileage: Number(mileage),
-      inspectionRating: Number(inspectionRating), description,
-      price, priceBreakdown: JSON.stringify(breakdown), userId: user.id,
-    },
-  });
+  data: {
+    brand, model, year: Number(year), mileage: Number(mileage),
+    inspectionRating: Number(inspectionRating), description,
+    imageUrl: imageUrl || null,
+    price, priceBreakdown: JSON.stringify(breakdown), userId: user.id,
+  },
+});
   return NextResponse.json(car, { status: 201 });
 }

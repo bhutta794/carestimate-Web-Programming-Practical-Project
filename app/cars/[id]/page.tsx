@@ -32,10 +32,18 @@ export default function CarDetailsPage({ params }: { params: Promise<{ id: strin
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <Link href="/buy" className="text-blue-600 hover:underline mb-6 inline-block">
-        ← Back to listings
-      </Link>
+  ← Back to listings
+</Link>
 
-      <div className="bg-white rounded-lg shadow p-8">
+{car.imageUrl && (
+  <img
+    src={car.imageUrl}
+    alt={`${car.brand} ${car.model}`}
+    className="w-full h-64 object-cover rounded-lg mb-6"
+  />
+)}
+
+<div className="bg-white rounded-lg shadow p-8">
         <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">

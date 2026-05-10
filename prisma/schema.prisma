@@ -27,11 +27,11 @@ model Car {
   mileage          Int
   inspectionRating Int
   description      String?
+  imageUrl         String?
   price            Int
   priceBreakdown   String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  
   userId           String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

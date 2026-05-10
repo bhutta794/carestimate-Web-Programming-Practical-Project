@@ -23,13 +23,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const car = await prisma.car.findUnique({ where: { id } });
   if (!car || car.userId !== user?.id) return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 
-  const { brand, model, year, mileage, inspectionRating, description } = await req.json();
-  const { price, breakdown } = calculatePrice({ brand, year, mileage, inspectionRating });
+ const { brand, model, year, mileage, inspectionRating, description, imageUrl } = await req.json();
+  const { price, breakdown } = calculatePrice({ brand, model, year, mileage, inspectionRating });
 
   const updated = await prisma.car.update({
-    where: { id },
-    data: { brand, model, year: Number(year), mileage: Number(mileage), inspectionRating: Number(inspectionRating), description, price, priceBreakdown: JSON.stringify(breakdown) },
-  });
+  where: { id },
+  data: { 
+    brand, model, year: Number(year), mileage: Number(mileage), 
+    inspectionRating: Number(inspectionRating), description, 
+    imageUrl: imageUrl || null,
+    price, priceBreakdown: JSON.stringify(breakdown) 
+  },
+});
   return NextResponse.json(updated);
 }
 

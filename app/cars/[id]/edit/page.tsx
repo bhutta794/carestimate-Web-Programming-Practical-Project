@@ -2,8 +2,9 @@
 import { use, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { BRAND_MODELS } from "@/lib/constants";
 
-const BRANDS = ["Toyota","Honda","BMW","Mercedes","Audi","Porsche","Lexus","Mazda","Volkswagen","Hyundai","Kia","Ford","Chevrolet","Nissan","Dodge","Jeep","Subaru","Volvo"];
+const BRANDS = Object.keys(BRAND_MODELS);
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: CURRENT_YEAR - 1949 }, (_, i) => CURRENT_YEAR - i);
 
@@ -12,22 +13,34 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
   const { data: session, status } = useSession();
   const router = useRouter();
   const [form, setForm] = useState({
-    brand: "Toyota", model: "", year: CURRENT_YEAR,
-    mileage: "", inspectionRating: 5, description: ""
+    brand: "Toyota",
+    model: BRAND_MODELS["Toyota"][0].model,
+    year: CURRENT_YEAR,
+    mileage: "",
+    inspectionRating: 5,
+    description: ""
   });
   const [preview, setPreview] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imageFile, setImageFile] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [currentImage, setCurrentImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/cars/${id}`)
       .then(r => r.json())
       .then(car => {
         setForm({
-          brand: car.brand, model: car.model, year: car.year,
-          mileage: String(car.mileage), inspectionRating: car.inspectionRating,
+          brand: car.brand,
+          model: car.model,
+          year: car.year,
+          mileage: String(car.mileage),
+          inspectionRating: car.inspectionRating,
           description: car.description || ""
         });
+        setCurrentImage(car.imageUrl || null);
       });
   }, [id]);
 
@@ -37,26 +50,59 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        brand: form.brand, year: form.year,
-        mileage: Number(form.mileage), inspectionRating: form.inspectionRating
-      })
-    }).then(r => r.json()).then(d => setPreview(d.price));
-  }, [form.brand, form.year, form.mileage, form.inspectionRating]);
+        brand: form.brand,
+        model: form.model,
+        year: form.year,
+        mileage: parseInt(form.mileage),
+        inspectionRating: form.inspectionRating,
+      }),
+    })
+      .then(r => r.json())
+      .then(d => setPreview(d.price));
+  }, [form.brand, form.model, form.year, form.mileage, form.inspectionRating]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageFile(reader.result as string);
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    let imageUrl = currentImage;
+
+    if (imageFile) {
+      setUploading(true);
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageFile }),
+      });
+      const uploadData = await uploadRes.json();
+      imageUrl = uploadData.url;
+      setUploading(false);
+    }
+
     const res = await fetch(`/api/cars/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+      body: JSON.stringify({ ...form, imageUrl })
     });
     setLoading(false);
     if (res.ok) router.push(`/cars/${id}`);
     else { const d = await res.json(); setError(d.message || "Update failed"); }
   };
 
-  if (status === "loading") return <div className="text-center py-20">Loading...</div>;
+  if (status === "loading") return (
+    <div className="text-center py-20">Loading...</div>
+  );
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -74,15 +120,23 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
         <div>
           <label className="block text-sm font-medium mb-1">Brand</label>
           <select className="w-full border rounded px-3 py-2" value={form.brand}
-            onChange={e => setForm({ ...form, brand: e.target.value })}>
-            {BRANDS.map(b => <option key={b}>{b}</option>)}
+            onChange={e => setForm({
+              ...form,
+              brand: e.target.value,
+              model: BRAND_MODELS[e.target.value][0].model
+            })}>
+            {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">Model</label>
-          <input type="text" className="w-full border rounded px-3 py-2"
-            value={form.model} onChange={e => setForm({ ...form, model: e.target.value })} required />
+          <select className="w-full border rounded px-3 py-2" value={form.model}
+            onChange={e => setForm({ ...form, model: e.target.value })}>
+            {BRAND_MODELS[form.brand].map(m => (
+              <option key={m.model} value={m.model}>{m.model}</option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -124,9 +178,28 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
             onChange={e => setForm({ ...form, description: e.target.value })} />
         </div>
 
-        <button type="submit" disabled={loading}
+        <div>
+          <label className="block text-sm font-medium mb-1">Car Image</label>
+          {currentImage && !imagePreview && (
+            <img src={currentImage} alt="Current"
+              className="mb-3 rounded-lg w-full h-48 object-cover" />
+          )}
+          {imagePreview && (
+            <img src={imagePreview} alt="New preview"
+              className="mb-3 rounded-lg w-full h-48 object-cover" />
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            onChange={handleImageChange}
+          />
+          <p className="text-xs text-gray-400 mt-1">Upload a new image to replace the current one</p>
+        </div>
+
+        <button type="submit" disabled={loading || uploading}
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50">
-          {loading ? "Updating..." : "Update Listing"}
+          {uploading ? "Uploading image..." : loading ? "Updating..." : "Update Listing"}
         </button>
       </form>
     </div>

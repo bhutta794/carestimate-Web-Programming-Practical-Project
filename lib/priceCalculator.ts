@@ -1,18 +1,24 @@
-﻿import { BRAND_SCORES } from "./constants";
+﻿import { BRAND_SCORES, BRAND_MODELS } from "./constants";
 
 export function calculatePrice({
   brand,
+  model,
   year,
   mileage,
   inspectionRating,
 }: {
   brand: string;
+  model: string;
   year: number;
   mileage: number;
   inspectionRating: number;
 }) {
   const currentYear = new Date().getFullYear();
   const age = currentYear - Number(year);
+
+  // Get base price from model
+  const modelData = BRAND_MODELS[brand]?.find(m => m.model === model);
+  const basePrice = modelData?.basePrice ?? 30000;
 
   // Age score (35%)
   const ageScore = age <= 0 ? 100 : age >= 15 ? 15 : 100 - (age / 15) * 85;
@@ -26,7 +32,7 @@ export function calculatePrice({
   const brandScore = BRAND_SCORES[brand] ?? 70;
 
   // Inspection score (15%)
-  const inspectionScore = (Number(inspectionRating) / 5) * 80 + 20;
+  const inspectionScore = (Number(inspectionRating) / 10) * 80 + 20;
 
   // Composite score
   let compositeScore =
@@ -37,13 +43,12 @@ export function calculatePrice({
 
   // Adjustments
   if (age > 15) compositeScore *= 0.6;
-  if (Number(inspectionRating) === 5) compositeScore *= 1.08;
+  if (Number(inspectionRating) === 10) compositeScore *= 1.08;
 
-  // Final price ($500 - $80,000, rounded to nearest $1,000)
-  const price =
-    Math.round(
-      Math.min(80000, Math.max(500, (compositeScore / 100) * 80000)) / 1000
-    ) * 1000;
+  // Final price based on base price
+  const price = Math.round(
+    Math.max(500, (compositeScore / 100) * basePrice) / 1000
+  ) * 1000;
 
   return {
     price,
@@ -53,6 +58,7 @@ export function calculatePrice({
       brandScore,
       inspectionScore: Math.round(inspectionScore),
       compositeScore: Math.round(compositeScore),
+      basePrice,
     },
   };
 }

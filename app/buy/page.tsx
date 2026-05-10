@@ -42,7 +42,8 @@ export default function BuyPage() {
   }, [brand]);
 
   const getStars = (rating: number) => {
-    return "⭐".repeat(rating) + "☆".repeat(5 - rating);
+    return <span className="font-semibold">{car.inspectionRating}/10</span>
+;
   };
 
   if (loading) {

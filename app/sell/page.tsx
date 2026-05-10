@@ -1,8 +1,8 @@
 ﻿"use client";
-
-import { useState, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const BRANDS = [
   "Toyota", "Honda", "BMW", "Mercedes", "Audi", "Porsche", "Lexus",
@@ -39,11 +39,8 @@ export default function SellPage() {
   const [error, setError] = useState("");
 
   // Redirect if not logged in
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+
+
 
   // Live price preview
   useEffect(() => {

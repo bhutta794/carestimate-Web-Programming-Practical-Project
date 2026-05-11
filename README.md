@@ -220,6 +220,70 @@ carestimate/
 
 ---
 
+## Development Log
+
+### How the App Works
+
+CarEstimate is built on Next.js App Router with TypeScript throughout. The authentication flow starts at `/register` where bcryptjs hashes the password before Prisma stores the user in PostgreSQL. NextAuth manages sessions using JWT — the user ID is extended into the session via `next-auth.d.ts` so ownership checks work server-side on every protected API route.
+
+When a car is listed, the form sends a request to `/api/price-preview` on every input change, which runs the weighted pricing algorithm in `priceCalculator.ts` and returns a live estimate. On final submission, `/api/cars` saves the record through Prisma with the calculated price. Edit and delete routes at `/api/cars/[id]` verify the requesting user's ID matches the car owner before allowing any changes.
+
+Image uploads are converted to base64 on the client and sent to `/api/upload`, which pushes them to Cloudinary and returns a URL that gets stored with the listing.
+
+### Problems Solved
+
+- **User ID not in session** — NextAuth does not expose the database user ID by default. Extended the session and JWT types in `next-auth.d.ts` and added the ID in the `jwt` callback inside `authOptions.ts`.
+- **Live price preview** — early version only calculated on form submit. Moved the fetch call into a `useEffect` watching all relevant fields so the estimate updates instantly on every change.
+- **Model dropdown per brand** — needed the model list to reset when the brand changes. Solved by storing brand/model pairs in `constants.ts` and resetting the model field in the `onChange` handler.
+- **Duplicate src folder** — during setup an extra nested `src/` directory was created. Removed the duplicate and cleaned up unused config files to fix import path errors.
+- **Prisma version conflict** — an incompatibility between the initial Prisma version and the Next.js config caused build errors. Downgraded to Prisma v5 and updated the config to resolve it.
+- **Ownership enforcement** — initially the edit and delete buttons were hidden on the frontend only. Added a server-side check in the API routes that returns 403 if the session user ID does not match the car's owner ID.
+
+### Git History
+
+```
+efe14c0 - docs: add screenshots to README (2026-05-11)
+cc2ca81 - fix: add favicon and PWA icons to metadata (2026-05-11)
+a346b1d - docs: update README with full project documentation (2026-05-11)
+722c76e - visual refinement: car details page, edit page, and global styling updates (2026-05-11)
+14320c9 - design: premium homepage with gradients, animations, and responsive layout (2026-05-11)
+a1375ba - improving design for buy page to make it consistent along with other pages (2026-05-11)
+566a19b - visual refinement: improved design for login and register pages (2026-05-11)
+6b8ac93 - navbar visual refinement, fixing nav bar (2026-05-11)
+e67591f - visual refinement of sell page (2026-05-11)
+b9ab357 - improved home page design (2026-05-11)
+0fd0017 - added custom CE favicon (2026-05-10)
+08c99db - fixed: add user id to session for correct ownership check (2026-05-10)
+33a5886 - update nav bar for listing (2026-05-10)
+20db313 - added image upload to edit car page (2026-05-10)
+6c945c1 - added image upload with Cloudinary for car listings (2026-05-10)
+1fd2838 - resolved some issues in buy car (2026-05-10)
+1308be4 - updated live price preview, now updates on every input change (2026-05-10)
+dc71a4a - removed duplicate src folder and unused placeholder files (2026-05-10)
+5c3bbf8 - remove unused config files (2026-05-10)
+5d696d9 - updated buy page car listings display (2026-05-10)
+0ad7063 - added model dropdown per brand with base prices for price calculation (2026-05-10)
+95a46ae - fix: remove weightage percentages from home page (2026-05-10)
+02aefc0 - fix: update inspection rating to 1-10 scale and remove price breakdown (2026-05-10)
+a3018f1 - added edit car page with live price preview (2026-05-10)
+fc68581 - fixing update config files, middleware and Prisma downgrade to v5 (2026-05-10)
+56a3620 - added cars API routes and car details page (2026-05-10)
+c7538b7 - added sell car page with live price preview (2026-05-10)
+9035256 - build home page with pricing breakdown and how it works (2026-05-10)
+81b69bc - added layout with AuthProvider and Navbar component (2026-05-10)
+d3d0ee5 - added buy page to browse all car listings (2026-05-10)
+6eef5ad - feat: add sell page with 5 inputs and live price preview API (2026-05-10)
+509e319 - added login page with NextAuth credentials (2026-05-10)
+33edb6d - added register API with bcrypt and register page (2026-05-09)
+d158850 - feat: implement price calculator with weighted scoring system (2026-05-09)
+c8472e5 - feat: add constants for car brands, years, and inspection ratings (2026-05-09)
+64fcf07 - feat: configure NextAuth with credentials provider and JWT strategy (2026-05-09)
+0da16b0 - configure PostgreSQL database and update Prisma schema for Car Marketplace (2026-05-09)
+abf13fe - initial setup: Next.js + Prisma + Neon PostgreSQL (2026-05-08)
+```
+
+---
+
 ## License
 
 This project was built as a Web Programming practical assignment.

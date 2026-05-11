@@ -4,6 +4,35 @@
 
 ---
 
+## Screenshots
+
+### Home
+![Home](./Screenshots/HomePage.png)
+![Home](./Screenshots/HomePage1.png)
+![Home](./Screenshots/HomePage2.png)
+![Home](./Screenshots/HomePage3.png)
+
+### Browse Listings
+![Listings](./Screenshots/Listings.png)
+
+### Car Details
+![Details](./Screenshots/Detials.png)
+
+### Sell a Car
+![Sell](./Screenshots/Sell.png)
+![Sell](./Screenshots/Sell1.png)
+
+### Edit & Delete
+![Edit Delete](./Screenshots/Edit%20Delete.png)
+![Update](./Screenshots/Update.png)
+![Update](./Screenshots/Update1.png)
+
+### Login & Register
+![Login](./Screenshots/Login.png)
+![Register](./Screenshots/Register.png)
+
+---
+
 ## Project Theme
 
 CarEstimate is a web application that lets users **list cars for sale** and receive a **system-calculated fair market price** based on a weighted algorithm. Instead of sellers setting arbitrary prices, the platform analyses four objective factors — vehicle age, mileage, brand reputation, and inspection condition — and computes a fair value automatically.
@@ -166,6 +195,20 @@ carestimate/
 │   ├── favicon-16x16.png
 │   ├── favicon-32x32.png
 │   └── site.webmanifest
+├── Screenshots/
+│   ├── HomePage.png
+│   ├── HomePage1.png
+│   ├── HomePage2.png
+│   ├── HomePage3.png
+│   ├── Listings.png
+│   ├── Detials.png
+│   ├── Sell.png
+│   ├── Sell1.png
+│   ├── Edit Delete.png
+│   ├── Update.png
+│   ├── Update1.png
+│   ├── Login.png
+│   └── Register.png
 ├── types/
 │   └── next-auth.d.ts               # NextAuth type extensions
 ├── .env                             # Environment variables (not committed)

@@ -71,7 +71,19 @@ export default async function HomePage() {
           backdrop-filter: blur(16px) saturate(180%);
           border-bottom: 1px solid var(--border);
         }
-        .nav-logo { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-1); }
+        .nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .nav-logo-mark {
+          width: 30px; height: 30px; border-radius: 8px;
+          background: var(--blue);
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .nav-logo-mark svg { display: block; }
+        .nav-logo-word {
+          font-size: 16px; font-weight: 800; letter-spacing: -0.04em; color: var(--text-1);
+          line-height: 1;
+        }
+        .nav-logo-word span { color: var(--blue); }
         .nav-links { display: flex; align-items: center; gap: 0.25rem; }
         .nav-link {
           padding: 8px 16px; border-radius: var(--radius-pill);
@@ -278,7 +290,17 @@ export default async function HomePage() {
 
       {/* Nav */}
       <nav className="nav">
-        <span className="nav-logo">CarEstimate</span>
+        <a href="/" className="nav-logo">
+          <div className="nav-logo-mark">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 11L4.5 5H11.5L14 11" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="4.5" cy="11.5" r="1.5" fill="white"/>
+              <circle cx="11.5" cy="11.5" r="1.5" fill="white"/>
+              <path d="M2 11H14" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <span className="nav-logo-word">Car<span>Estimate</span></span>
+        </a>
         <div className="nav-links">
           <Link href="/buy" className="nav-link">Browse</Link>
           {session ? (
@@ -441,7 +463,17 @@ export default async function HomePage() {
       {/* Footer */}
       <footer className="footer">
         <div className="footer-inner">
-          <span className="footer-logo">CarEstimate</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--blue)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 11L4.5 5H11.5L14 11" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="4.5" cy="11.5" r="1.5" fill="white"/>
+                <circle cx="11.5" cy="11.5" r="1.5" fill="white"/>
+                <path d="M2 11H14" stroke="white" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <span className="footer-logo">Car<span style={{ color: "var(--blue)" }}>Estimate</span></span>
+          </div>
           <div className="footer-links">
             {["Privacy", "Terms", "Contact", "FAQ"].map((l) => (
               <a key={l} href="#" className="footer-link">{l}</a>
